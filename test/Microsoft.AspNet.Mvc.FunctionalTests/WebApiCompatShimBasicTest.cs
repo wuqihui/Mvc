@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -9,8 +8,6 @@ using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.TestHost;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -18,15 +15,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class WebApiCompatShimBasicTest
     {
-        private readonly IServiceProvider _provider = TestHelper.CreateServices(nameof(WebApiCompatShimWebSite));
-        private readonly Action<IApplicationBuilder> _app = new WebApiCompatShimWebSite.Startup().Configure;
-
         [Fact]
         public async Task ApiController_Activates_HttpContextAndUser()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/BasicApi/WriteToHttpContext");
@@ -43,8 +37,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Activates_UrlHelper()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/BasicApi/GenerateUrl");
@@ -63,8 +57,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task Options_SetsDefaultFormatters()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected = new string[]
             {
@@ -90,8 +84,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionThrowsHttpResponseException_WithStatusCode()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -107,8 +101,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionThrowsHttpResponseException_WithResponse()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -125,8 +119,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionThrowsHttpResponseException_EnsureGlobalHttpresponseExceptionActionFilter_IsInvoked()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -143,8 +137,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionThrowsHttpResponseException_EnsureGlobalFilterConvention_IsApplied()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -162,8 +156,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CanValidateCustomObjectWithPrefix_Fails()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync(
@@ -179,8 +173,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CanValidateCustomObject_IsSuccessFul()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/api/Blog/BasicApi/ValidateObject_Passes");
@@ -193,8 +187,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CanValidateCustomObject_Fails()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/api/Blog/BasicApi/ValidateObjectFails");
@@ -209,11 +203,11 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_RequestProperty()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
-                "POST http://localhost/api/Blog/HttpRequestMessage/EchoProperty localhost " +
+                "POST " + site.BaseUrl + "/api/Blog/HttpRequestMessage/EchoProperty " + site.Host + " " +
                 "13 Hello, world!";
 
             // Act
@@ -231,11 +225,11 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_RequestParameter()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
-                "POST http://localhost/api/Blog/HttpRequestMessage/EchoParameter localhost " +
+                "POST " + site.BaseUrl + "/api/Blog/HttpRequestMessage/EchoParameter " + site.Host + " "+
                 "17 Hello, the world!";
 
             // Act
@@ -253,8 +247,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_ResponseReturned()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
                 "POST Hello, HttpResponseMessage world!";
@@ -279,8 +273,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_ResponseReturned_Chunked()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
                 "POST Hello, HttpResponseMessage world!";
@@ -309,8 +303,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreateResponse_Conneg(string accept, string mediaType)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -334,8 +328,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreateResponse_HardcodedMediaType(string mediaType)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -359,8 +353,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreateResponse_Conneg_Error(string accept, string mediaType)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -382,8 +376,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreateResponse_HardcodedFormatter()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(
                 HttpMethod.Get,
@@ -408,8 +402,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task WebApiRouting_AccessMvcController(string url, HttpStatusCode expected)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
@@ -426,8 +420,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task WebApiRouting_AccessWebApiController(string url, HttpStatusCode expected)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
@@ -442,8 +436,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Returns_ByteArrayContent()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
             var expectedBody = "Hello from ByteArrayContent!!";
 
             // Act
@@ -462,8 +456,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Returns_StreamContent()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
             var expectedBody = "This content is from a file";
 
             // Act
@@ -486,8 +480,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Returns_PushStreamContent(string action, string expectedBody)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/HttpRequestMessage/" + action);
@@ -505,8 +499,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Returns_PushStreamContentWithCustomHeaders()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
             var expectedBody = "Hello from PushStreamContent with custom headers!!";
             var multipleValues = new[] { "value1", "value2" };
 

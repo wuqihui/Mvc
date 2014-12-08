@@ -15,15 +15,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class AntiForgeryTests
     {
-        private readonly IServiceProvider _services = TestHelper.CreateServices("AntiForgeryWebSite");
-        private readonly Action<IApplicationBuilder> _app = new AntiForgeryWebSite.Startup().Configure;
-
         [Fact]
         public async Task MultipleAFTokensWithinTheSamePage_GeneratesASingleCookieToken()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Account/Login");
@@ -45,8 +42,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task MultipleFormPostWithingASingleView_AreAllowed()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             // do a get response.
             var getResponse = await client.GetAsync("http://localhost/Account/Login");
@@ -76,12 +73,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("OK", await response.Content.ReadAsStringAsync());
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task InvalidCookieToken_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             var getResponse = await client.GetAsync("http://localhost/Account/Login");
             var resposneBody = await getResponse.Content.ReadAsStringAsync();
@@ -105,12 +102,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("The anti-forgery token could not be decrypted.", ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task InvalidFormToken_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             var getResponse = await client.GetAsync("http://localhost/Account/Login");
             var resposneBody = await getResponse.Content.ReadAsStringAsync();
@@ -132,12 +129,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("The anti-forgery token could not be decrypted.", ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task IncompatibleCookieToken_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             // do a get response.
             // We do two requests to get two different sets of anti forgery cookie and token values.
@@ -167,12 +164,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("The anti-forgery cookie token and form field token do not match.", ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MissingCookieToken_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
 
             // do a get response.
             var getResponse = await client.GetAsync("http://localhost/Account/Login");
@@ -194,12 +191,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("The required anti-forgery cookie \"__RequestVerificationToken\" is not present.", ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MissingAFToken_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(AntiForgeryWebSite));
+            var client = site.CreateClient();
             var getResponse = await client.GetAsync("http://localhost/Account/Login");
             var resposneBody = await getResponse.Content.ReadAsStringAsync();
             var cookieToken = AntiForgeryTestHelper.RetrieveAntiForgeryCookie(getResponse);

@@ -14,15 +14,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class ApiExplorerTest
     {
-        private readonly IServiceProvider _provider = TestHelper.CreateServices("ApiExplorerWebSite");
-        private readonly Action<IApplicationBuilder> _app = new ApiExplorer.Startup().Configure;
-
         [Fact]
         public async Task ApiExplorer_IsVisible_EnabledWithConvention()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerVisbilityEnabledByConvention");
@@ -38,8 +35,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_IsVisible_DisabledWithConvention()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerVisbilityDisabledByConvention");
@@ -55,8 +52,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_IsVisible_DisabledWithAttribute()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerVisibilitySetExplicitly/Disabled");
@@ -72,8 +69,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_IsVisible_EnabledWithAttribute()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerVisibilitySetExplicitly/Enabled");
@@ -89,8 +86,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_GroupName_SetByConvention()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerNameSetByConvention");
@@ -107,8 +104,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_GroupName_SetByAttributeOnController()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerNameSetExplicitly/SetOnController");
@@ -125,8 +122,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_GroupName_SetByAttributeOnAction()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerNameSetExplicitly/SetOnAction");
@@ -143,8 +140,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_DisplaysFixedRoute()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerRouteAndPathParametersInformation");
@@ -161,8 +158,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_DisplaysRouteWithParameters()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerRouteAndPathParametersInformation/5");
@@ -185,8 +182,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_StripsInlineConstraintsFromThePath()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/Constraint/5";
 
             // Act
@@ -210,8 +207,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_StripsCatchAllsFromThePath()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/CatchAll/5";
 
             // Act
@@ -234,8 +231,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_StripsCatchAllsWithConstraintsFromThePath()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/CatchAllAndConstraint/5";
 
             // Act
@@ -261,8 +258,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplateStripsMultipleConstraints_OnTheSamePathSegment()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/"
                 + "MultipleParametersInSegment/12-01-1987";
@@ -300,8 +297,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplateStripsMultipleConstraints_InMultipleSegments()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/"
                 + "MultipleParametersInMultipleSegments/12/01/1987";
 
@@ -338,8 +335,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_DescribeParameters_FromAllSources()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/ApiExplorerRouteAndPathParametersInformation/MultipleTypesOfParameters/1/2/3";
 
             var expectedRelativePath = "ApiExplorerRouteAndPathParametersInformation/"
@@ -369,8 +366,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_RouteTemplate_MakesParametersOptional()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerRouteAndPathParametersInformation/Optional/");
@@ -391,8 +388,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_HttpMethod_All()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerHttpMethod/All");
@@ -409,8 +406,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_HttpMethod_Single()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerHttpMethod/Get");
@@ -431,8 +428,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_HttpMethod_Single(string httpMethod)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(
                 new HttpMethod(httpMethod),
@@ -457,8 +454,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseType_VoidWithoutAttribute(string action)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -482,8 +479,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseType_UnknownWithoutAttribute(string action)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -498,15 +495,15 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         }
 
         [Theory]
-        [InlineData("GetProduct", "ApiExplorer.Product")]
+        [InlineData("GetProduct", "ApiExplorerWebSite.Product")]
         [InlineData("GetInt", "System.Int32")]
-        [InlineData("GetTaskOfProduct", "ApiExplorer.Product")]
+        [InlineData("GetTaskOfProduct", "ApiExplorerWebSite.Product")]
         [InlineData("GetTaskOfInt", "System.Int32")]
         public async Task ApiExplorer_ResponseType_KnownWithoutAttribute(string action, string type)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -521,16 +518,16 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         }
 
         [Theory]
-        [InlineData("GetVoid", "ApiExplorer.Customer")]
-        [InlineData("GetObject", "ApiExplorer.Product")]
+        [InlineData("GetVoid", "ApiExplorerWebSite.Customer")]
+        [InlineData("GetObject", "ApiExplorerWebSite.Product")]
         [InlineData("GetIActionResult", "System.String")]
-        [InlineData("GetProduct", "ApiExplorer.Customer")]
+        [InlineData("GetProduct", "ApiExplorerWebSite.Customer")]
         [InlineData("GetTask", "System.Int32")]
         public async Task ApiExplorer_ResponseType_KnownWithAttribute(string action, string type)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -545,13 +542,13 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         }
 
         [Theory]
-        [InlineData("Controller", "ApiExplorer.Product")]
-        [InlineData("Action", "ApiExplorer.Customer")]
+        [InlineData("Controller", "ApiExplorerWebSite.Product")]
+        [InlineData("Action", "ApiExplorerWebSite.Customer")]
         public async Task ApiExplorer_ResponseType_OverrideOnAction(string action, string type)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -569,8 +566,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseContentType_Unset()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerResponseContentType/Unset");
@@ -600,8 +597,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseContentType_AllTypes()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerResponseContentType/AllTypes");
@@ -630,8 +627,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseContentType_Range()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerResponseContentType/Range");
@@ -656,8 +653,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseContentType_Specific()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerResponseContentType/Specific");
@@ -679,8 +676,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiExplorer_ResponseContentType_NoMatch()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ApiExplorerResponseContentType/NoMatch");
@@ -704,8 +701,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             string formatterType)
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ApiExplorerWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(

@@ -9,8 +9,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.TestHost;
 using ModelBindingWebSite;
 using Newtonsoft.Json;
 using Xunit;
@@ -19,9 +17,6 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class ModelBindingTests
     {
-        private readonly IServiceProvider _services = TestHelper.CreateServices("ModelBindingWebSite");
-        private readonly Action<IApplicationBuilder> _app = new ModelBindingWebSite.Startup().Configure;
-
         [Theory]
         [InlineData("RestrictValueProvidersUsingFromRoute", "valueFromRoute")]
         [InlineData("RestrictValueProvidersUsingFromQuery", "valueFromQuery")]
@@ -29,8 +24,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CompositeModelBinder_Restricts_ValueProviders(string actionName, string expectedValue)
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Provide all three values, it should bind based on the attribute on the action method.
             var request = new HttpRequestMessage(HttpMethod.Post,
@@ -54,8 +49,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModel_WithAPropertyFromBody()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // the name would be of customer.Department.Name
             // and not for the top level customer object.
@@ -80,8 +75,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanModelBindServiceToAnArgument()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/FromServices_Calculator/Add?left=1234&right=1");
@@ -94,8 +89,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         [Fact]
         public async Task CanModelBindServiceToAProperty()
         {
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -109,8 +104,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         [Fact]
         public async Task CanModelBindServiceToAProperty_OnBaseType()
         {
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -121,12 +116,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("50", await response.Content.ReadAsStringAsync());
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MultipleParametersMarkedWithFromBody_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -136,12 +131,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
                          ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MultipleParameterAndPropertiesMarkedWithFromBody_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -151,12 +146,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
                          ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MultipleParametersMarkedWith_FromFormAndFromBody_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -166,12 +161,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
                          ex.Message);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task MultipleParameterAndPropertiesMarkedWith_FromFormAndFromBody_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             var ex = await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -185,8 +180,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_MultipleParameters_UsingFromForm()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Post,
                 "http://localhost/FromAttributes/MultipleFromFormParameters");
@@ -223,8 +218,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_MultipleProperties_UsingFromForm()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             var request = new HttpRequestMessage(HttpMethod.Post,
                 "http://localhost/FromAttributes/MultipleFromFormParameterAndProperty");
@@ -261,8 +256,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_ComplexData_OnParameters_UsingFromAttributes()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Provide all three values, it should bind based on the attribute on the action method.
             var request = new HttpRequestMessage(HttpMethod.Post,
@@ -305,8 +300,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_ComplexData_OnProperties_UsingFromAttributes()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Provide all three values, it should bind based on the attribute on the action method.
             var request = new HttpRequestMessage(HttpMethod.Post,
@@ -350,8 +345,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_ComplexData_OnProperties_UsingFromAttributes_WithBody()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Provide all three values, it should bind based on the attribute on the action method.
             var request = new HttpRequestMessage(HttpMethod.Post,
@@ -390,8 +385,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task NonExistingModelBinder_ForABinderMetadata_DoesNotRecurseInfinitely()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             var response = await client.GetStringAsync("http://localhost/WithBinderMetadata/EchoDocument");
@@ -408,8 +403,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ParametersWithNoValueProviderMetadataUseTheAvailableValueProviders()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -430,8 +425,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ParametersAreAlwaysCreated_IfValuesAreProvidedWithoutModelName()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -452,8 +447,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ParametersAreAlwaysCreated_IfValueIsProvidedForModelName()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -473,8 +468,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ParametersAreAlwaysCreated_IfNoValuesAreProvided()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -494,8 +489,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task PropertiesAreBound_IfTheyAreProvidedByValueProviders()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -516,8 +511,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task PropertiesAreBound_IfTheyAreMarkedExplicitly()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -537,8 +532,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task PropertiesAreBound_IfTheyArePocoMetadataMarkedTypes()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -562,8 +557,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task PropertiesAreNotBound_ByDefault()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -584,8 +579,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanBind_ComplexData_FromRouteData(string url)
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await
@@ -607,8 +602,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBindCancellationTokenParameteres()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ActionWithCancellationToken");
@@ -622,8 +617,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBindCancellationToken_ForProperties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -638,8 +633,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBindingBindsBase64StringsToByteArrays()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/Index?byteValues=SGVsbG9Xb3JsZA==");
@@ -653,8 +648,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBindingBindsEmptyStringsToByteArrays()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/Index?byteValues=");
@@ -668,8 +663,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBinding_LimitsErrorsToMaxErrorCount()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
             var queryString = string.Join("=&", Enumerable.Range(0, 10).Select(i => "field" + i));
 
             // Act
@@ -693,8 +688,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ModelBinding_ValidatesAllPropertiesInModel()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/Home/ModelWithFewValidationErrors?model=");
@@ -711,8 +706,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_Filters_UsingDefaultPropertyFilterProvider_WithExpressions()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -734,8 +729,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_Filters_UsingPropertyFilterProvider_UsingServices()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -757,8 +752,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_Filters_UsingDefaultPropertyFilterProvider_WithPredicate()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -776,8 +771,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_AppliesAtBothParameterAndTypeLevelTogether_BlacklistedAtEitherLevelIsNotBound()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -795,8 +790,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_AppliesAtBothParameterAndTypeLevelTogether_IncludedAtBothLevelsIsBound()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -813,8 +808,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_AppliesAtBothParameterAndTypeLevelTogether_IncludingAtOneLevelIsNotBound()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -832,8 +827,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_BindsUsingParameterPrefix()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -848,8 +843,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_DoesNotUseTypePrefix()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -864,8 +859,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_FallsBackOnEmptyPrefixIfNoParameterPrefixIsProvided()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/BindAttribute/" +
@@ -880,8 +875,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task BindAttribute_DoesNotFallBackOnEmptyPrefixIfParameterPrefixIsProvided()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/BindAttribute/" +
@@ -897,8 +892,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModel_IncludeTopLevelProperty_IncludesAllSubProperties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -922,12 +917,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Null(user.RegisterationMonth);
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task TryUpdateModel_ChainedPropertyExpression_Throws()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
             Expression<Func<User, object>> expression = model => model.Address.Country;
 
             // Act
@@ -943,8 +938,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModel_FailsToUpdateProperties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -962,8 +957,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModel_IncludeExpression_WorksOnlyAtTopLevel()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -985,8 +980,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModel_Validates_ForTopLevelNotIncludedProperties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -1002,8 +997,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModelExcludeSpecific_Properties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -1025,8 +1020,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModelIncludeSpecific_Properties()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +
@@ -1048,8 +1043,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TryUpdateModelIncludesAllProperties_ByDefault()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(ModelBindingWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetStringAsync("http://localhost/TryUpdateModel/" +

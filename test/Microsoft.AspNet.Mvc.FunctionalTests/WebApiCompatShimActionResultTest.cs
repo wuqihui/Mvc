@@ -4,23 +4,18 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.TestHost;
 using Xunit;
 
 namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class WebApiCompatShimActionResultTest
     {
-        private readonly IServiceProvider _provider = TestHelper.CreateServices(nameof(WebApiCompatShimWebSite));
-        private readonly Action<IApplicationBuilder> _app = new WebApiCompatShimWebSite.Startup().Configure;
-
         [Fact]
         public async Task ApiController_BadRequest()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetBadRequest");
@@ -33,8 +28,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_BadRequestMessage()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetBadRequestMessage");
@@ -49,8 +44,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_BadRequestModelState()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected = "{\"Message\":\"The request is invalid.\",\"ModelState\":{\"product.Name\":[\"Name is required.\"]}}";
 
@@ -67,8 +62,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Conflict()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetConflict");
@@ -81,8 +76,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Content()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetContent");
@@ -97,8 +92,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreatedRelative()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetCreatedRelative");
@@ -114,8 +109,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreatedAbsolute()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetCreatedAbsolute");
@@ -131,8 +126,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreatedQualified()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetCreatedQualified");
@@ -148,8 +143,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreatedUri()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetCreatedUri");
@@ -165,8 +160,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_CreatedAtRoute()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetCreatedAtRoute");
@@ -175,15 +170,15 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             // Assert
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             Assert.Equal("{\"Name\":\"Test User\"}", content);
-            Assert.Equal("http://localhost/api/Blog/ActionResult/GetUser/5", response.Headers.Location.OriginalString);
+            Assert.Equal(site.BaseUrl + "/api/Blog/ActionResult/GetUser/5", response.Headers.Location.OriginalString);
         }
 
         [Fact]
         public async Task ApiController_InternalServerError()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetInternalServerError");
@@ -196,8 +191,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_InternalServerErrorException()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetInternalServerErrorException");
@@ -212,8 +207,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Json()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetJson");
@@ -228,8 +223,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_JsonSettings()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
                 "{" + Environment.NewLine +
@@ -249,8 +244,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_JsonSettingsEncoding()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             var expected =
                 "{" + Environment.NewLine +
@@ -271,8 +266,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_NotFound()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetNotFound");
@@ -285,8 +280,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_Ok()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetOk");
@@ -299,8 +294,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_OkContent()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetOkContent");
@@ -315,8 +310,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_RedirectString()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetRedirectString");
@@ -330,8 +325,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_RedirectUri()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetRedirectUri");
@@ -345,8 +340,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_ResponseMessage()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetResponseMessage");
@@ -360,8 +355,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ApiController_StatusCode()
         {
             // Arrange
-            var server = TestServer.Create(_provider, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(WebApiCompatShimWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/api/Blog/ActionResult/GetStatusCode");

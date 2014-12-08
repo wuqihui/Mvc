@@ -4,23 +4,18 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.TestHost;
 using Xunit;
 
 namespace Microsoft.AspNet.Mvc.FunctionalTests
 {
     public class FiltersTest
     {
-        private readonly IServiceProvider _services = TestHelper.CreateServices("FiltersWebSite");
-        private readonly Action<IApplicationBuilder> _app = new FiltersWebSite.Startup().Configure;
-
         [Fact]
         public async Task ListAllFilters()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Products/GetPrice/5");
@@ -60,8 +55,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task AnonymousUsersAreBlocked()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Anonymous/GetHelloWorld");
@@ -74,8 +69,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task AllowsAnonymousUsersToAccessController()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/RandomNumber/GetRandomNumber");
@@ -89,8 +84,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task CanAuthorizeParticularUsers()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync(
@@ -105,8 +100,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ServiceFilterUsesRegisteredServicesAsFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/RandomNumber/GetRandomNumber");
@@ -116,12 +111,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("4", await response.Content.ReadAsStringAsync());
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task ServiceFilterThrowsIfServiceIsNotRegistered()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/RandomNumber/GetAuthorizedRandomNumber";
 
             // Act & Assert
@@ -132,8 +127,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task TypeFilterInitializesArguments()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/RandomNumber/GetModifiedRandomNumber?randomNumber=10";
 
             // Act
@@ -144,12 +139,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
             Assert.Equal("22", await response.Content.ReadAsStringAsync());
         }
 
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task TypeFilterThrowsIfServicesAreNotRegistered()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
             var url = "http://localhost/RandomNumber/GetHalfOfModifiedRandomNumber?randomNumber=3";
 
             // Act & Assert
@@ -160,8 +155,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionFilterOverridesActionExecuted()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/XmlSerializer/GetDummyClass?sampleInput=10");
@@ -177,8 +172,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ResultFilterOverridesOnResultExecuting()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/DummyClass/GetDummyClass");
@@ -194,8 +189,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ResultFilterOverridesOnResultExecuted()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/DummyClass/GetEmptyActionResult");
@@ -211,8 +206,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task OrderOfExecutionOfFilters_WhenOrderAttribute_IsNotMentioned()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/GetSampleString");
@@ -229,8 +224,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ExceptionsHandledInActionFilters_WillNotShortCircuitResultFilters()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ThrowExceptionAndHandleInActionFilter");
@@ -246,8 +241,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ExceptionFilter_OnAction_ShortCircuitsResultFilters()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ThrowExcpetion");
@@ -265,8 +260,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task GlobalExceptionFilter_HandlesAnException()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Exception/GetError?error=RandomError");
@@ -282,8 +277,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ExceptionFilter_Scope()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ExceptionOrder/GetError");
@@ -304,8 +299,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionFilter_Scope()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ActionFilter/GetHelloWorld");
@@ -331,8 +326,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ResultFilter_Scope()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/ResultFilter/GetHelloWorld");
@@ -354,8 +349,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task FiltersWithOrder()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/RandomNumber/GetOrderedRandomNumber");
@@ -371,8 +366,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionFiltersWithOrder()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ActionFilterOrder");
@@ -392,8 +387,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ResultFiltersWithOrder()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ResultFilterOrder");
@@ -411,8 +406,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ActionFilterShortCircuitsAction()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/DummyClass/ActionNeverGetsExecuted");
@@ -428,8 +423,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ResultFilterShortCircuitsResult()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/DummyClass/ResultNeverGetsExecuted");
@@ -445,8 +440,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ExceptionFilterShortCircuitsAnotherExceptionFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ThrowRandomExcpetion");
@@ -458,12 +453,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 
         // Result Filter throws.
         // Exception Filters don't get a chance to handle this.
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task ThrowingFilters_ResultFilter_NotHandledByGlobalExceptionFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidProgramException>(
@@ -476,8 +471,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ThrowingFilters_ActionFilter_HandledByGlobalExceptionFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ThrowingActionFilter");
@@ -489,12 +484,12 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
 
         // Authorization Filter throws.
         // Exception Filters don't get a chance to handle this.
-        [Fact]
+        [InMemoryFact("Verifies Exception Behavior")]
         public async Task ThrowingFilters_AuthFilter_NotHandledByGlobalExceptionFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act & Assert
             await Assert.ThrowsAsync<InvalidProgramException>(
@@ -507,8 +502,8 @@ namespace Microsoft.AspNet.Mvc.FunctionalTests
         public async Task ThrowingExceptionFilter_ExceptionFilter_NotHandledByGlobalExceptionFilter()
         {
             // Arrange
-            var server = TestServer.Create(_services, _app);
-            var client = server.CreateClient();
+            var site = TestWebSite.Create(nameof(FiltersWebSite));
+            var client = site.CreateClient();
 
             // Act
             var response = await client.GetAsync("http://localhost/Home/ThrowingExceptionFilter");
