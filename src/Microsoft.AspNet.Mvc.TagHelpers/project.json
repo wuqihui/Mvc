@@ -1,14 +1,17 @@
 {
   "description": "Contains a default set of Tag Helpers for building ASP.NET MVC applications.",
-  "version": "6.0.0-*",
+  "version": "6.0.0-beta3",
   "compilationOptions": {
     "warningsAsErrors": true
   },
   "dependencies": {
-    "Microsoft.AspNet.Mvc.Common": { "version": "6.0.0-*", "type": "build" },
-    "Microsoft.AspNet.Mvc.Razor": "6.0.0-*",
-    "Microsoft.Framework.Cache.Memory": "1.0.0-*",
-    "System.Security.Cryptography.Hashing.Algorithms":  "4.0.0-beta-*"
+    "Microsoft.AspNet.Mvc.Common": {
+      "version": "6.0.0-beta3",
+      "type": "build"
+    },
+    "Microsoft.AspNet.Mvc.Razor": "6.0.0-beta3",
+    "Microsoft.Framework.Cache.Memory": "1.0.0-beta3",
+    "System.Security.Cryptography.Hashing.Algorithms": "4.0.0-beta-22605"
   },
   "frameworks": {
     "aspnet50": {},

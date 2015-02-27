@@ -1,25 +1,31 @@
 {
   "description": "The core runtime components of ASP.NET MVC.",
-  "version": "6.0.0-*",
+  "version": "6.0.0-beta3",
   "compilationOptions": {
     "warningsAsErrors": true
   },
   "dependencies": {
-    "Microsoft.AspNet.FileProviders": "1.0.0-*",
-    "Microsoft.AspNet.Hosting": "1.0.0-*",
-    "Microsoft.AspNet.Http.Extensions": "1.0.0-*",
-    "Microsoft.AspNet.Mvc.Common": { "version": "6.0.0-*", "type": "build" },
-    "Microsoft.AspNet.Mvc.ModelBinding": "6.0.0-*",
-    "Microsoft.AspNet.Routing": "1.0.0-*",
-    "Microsoft.AspNet.Security": "1.0.0-*",
-    "Microsoft.AspNet.Security.DataProtection": "1.0.0-*",
-    "Microsoft.Framework.Runtime.Interfaces": { "version": "1.0.0-*", "type": "build" }
+    "Microsoft.AspNet.FileProviders": "1.0.0-beta3",
+    "Microsoft.AspNet.Hosting": "1.0.0-beta3",
+    "Microsoft.AspNet.Http.Extensions": "1.0.0-beta3",
+    "Microsoft.AspNet.Mvc.Common": {
+      "version": "6.0.0-beta3",
+      "type": "build"
+    },
+    "Microsoft.AspNet.Mvc.ModelBinding": "6.0.0-beta3",
+    "Microsoft.AspNet.Routing": "1.0.0-beta3",
+    "Microsoft.AspNet.Security": "1.0.0-beta3",
+    "Microsoft.AspNet.Security.DataProtection": "1.0.0-beta3",
+    "Microsoft.Framework.Runtime.Interfaces": {
+      "version": "1.0.0-beta3",
+      "type": "build"
+    }
   },
   "frameworks": {
     "aspnet50": {},
     "aspnetcore50": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.0-beta-*"
+        "Microsoft.CSharp": "4.0.0-beta-22605"
       }
     }
   }
