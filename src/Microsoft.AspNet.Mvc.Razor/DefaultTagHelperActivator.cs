@@ -44,19 +44,19 @@ namespace Microsoft.AspNet.Mvc.Razor
                 activateInfo.Activate(tagHelper, context);
             }
 
-            ConfigureTagHelper(tagHelper, context);
+            InitializeTagHelper(tagHelper, context);
         }
 
-        private static void ConfigureTagHelper<TTagHelper>(TTagHelper tagHelper, ViewContext context)
+        private static void InitializeTagHelper<TTagHelper>(TTagHelper tagHelper, ViewContext context)
             where TTagHelper : ITagHelper
         {
-            // Run any IConfigureTagHelper<TTagHelper> in the container
+            // Run any IInitializeTagHelper<TTagHelper> in the container
             var serviceProvider = context.HttpContext.RequestServices;
-            var configurators = serviceProvider.GetService<IEnumerable<IConfigureTagHelper<TTagHelper>>>();
+            var initializers = serviceProvider.GetService<IEnumerable<IInitializeTagHelper<TTagHelper>>>();
 
-            foreach (var configurator in configurators)
+            foreach (var initializer in initializers)
             {
-                configurator.Configure(tagHelper, context);
+                initializer.Initialize(tagHelper, context);
             }
         }
 

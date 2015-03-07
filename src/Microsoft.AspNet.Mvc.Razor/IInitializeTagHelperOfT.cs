@@ -6,19 +6,19 @@ using Microsoft.AspNet.Razor.Runtime.TagHelpers;
 namespace Microsoft.AspNet.Mvc.Razor
 {
     /// <summary>
-    /// Configures an <see cref="ITagHelper"/> before it's executed.
+    /// Initializes an <see cref="ITagHelper"/> before it's executed.
     /// </summary>
     /// <typeparam name="TTagHelper">The <see cref="ITagHelper"/> type.</typeparam>
-    public interface IConfigureTagHelper<TTagHelper>
+    public interface IInitializeTagHelper<TTagHelper>
         where TTagHelper : ITagHelper
     {
         /// <summary>
-        /// Configures the <see cref="TTagHelper"/> using <see cref="Action"/>;
+        /// Initializes the <see cref="TTagHelper"/> using <see cref="Action"/>;
         /// </summary>
-        /// <param name="helper">The <see cref="TTagHelper"/> to configure.</param>
+        /// <param name="helper">The <see cref="TTagHelper"/> to initialize.</param>
         /// <param name="context">
         ///     The <see cref="ViewContext"/> for the <see cref="IView"/> the <see cref="TTagHelper"/> is in.
         /// </param>
-        void Configure(TTagHelper helper, ViewContext context);
+        void Initialize(TTagHelper helper, ViewContext context);
     }
 }

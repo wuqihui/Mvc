@@ -346,7 +346,7 @@ Products: Laptops (3)";
         {
             // Arrange
             var newServices = new ServiceCollection();
-            newServices.ConfigureTagHelper<FormTagHelper>((form, vc) => form.AntiForgery = optionsAntiForgery);
+            newServices.InitializeTagHelper<FormTagHelper>((helper, _) => helper.AntiForgery = optionsAntiForgery);
             var serviceProvider = TestHelper.CreateServices("MvcTagHelpersWebSite", newServices);
             var server = TestServer.Create(serviceProvider, _app);
             var client = server.CreateClient();
