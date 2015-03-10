@@ -36,86 +36,83 @@ namespace Microsoft.AspNet.Mvc.Core
 
         public Task<ActionDescriptor> SelectAsync([NotNull] RouteContext context)
         {
-            using (_logger.BeginScope("DefaultActionSelector.SelectAsync"))
+            var tree = _decisionTreeProvider.DecisionTree;
+            var matchingRouteConstraints = tree.Select(context.RouteData.Values);
+
+            var candidates = new List<ActionSelectorCandidate>();
+            foreach (var action in matchingRouteConstraints)
             {
-                var tree = _decisionTreeProvider.DecisionTree;
-                var matchingRouteConstraints = tree.Select(context.RouteData.Values);
+                var constraints = GetConstraints(context.HttpContext, action);
+                candidates.Add(new ActionSelectorCandidate(action, constraints));
+            }
 
-                var candidates = new List<ActionSelectorCandidate>();
-                foreach (var action in matchingRouteConstraints)
+            var matchingActionConstraints =
+                EvaluateActionConstraints(context, candidates, startingOrder: null);
+
+            List<ActionDescriptor> matchingActions = null;
+            if (matchingActionConstraints != null)
+            {
+                matchingActions = new List<ActionDescriptor>(matchingActionConstraints.Count);
+                foreach (var candidate in matchingActionConstraints)
                 {
-                    var constraints = GetConstraints(context.HttpContext, action);
-                    candidates.Add(new ActionSelectorCandidate(action, constraints));
+                    matchingActions.Add(candidate.Action);
                 }
+            }
 
-                var matchingActionConstraints =
-                    EvaluateActionConstraints(context, candidates, startingOrder: null);
+            var finalMatches = SelectBestActions(matchingActions);
 
-                List<ActionDescriptor> matchingActions = null;
-                if (matchingActionConstraints != null)
+            if (finalMatches == null || finalMatches.Count == 0)
+            {
+                if (_logger.IsEnabled(LogLevel.Verbose))
                 {
-                    matchingActions = new List<ActionDescriptor>(matchingActionConstraints.Count);
-                    foreach (var candidate in matchingActionConstraints)
+                    _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
                     {
-                        matchingActions.Add(candidate.Action);
-                    }
+                        ActionsMatchingRouteConstraints = matchingRouteConstraints,
+                        ActionsMatchingActionConstraints = matchingActions,
+                        FinalMatches = finalMatches,
+                    });
                 }
 
-                var finalMatches = SelectBestActions(matchingActions);
+                return Task.FromResult<ActionDescriptor>(null);
+            }
+            else if (finalMatches.Count == 1)
+            {
+                var selectedAction = finalMatches[0];
 
-                if (finalMatches == null || finalMatches.Count == 0)
+                if (_logger.IsEnabled(LogLevel.Verbose))
                 {
-                    if (_logger.IsEnabled(LogLevel.Verbose))
+                    _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
                     {
-                        _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
-                        {
-                            ActionsMatchingRouteConstraints = matchingRouteConstraints,
-                            ActionsMatchingActionConstraints = matchingActions,
-                            FinalMatches = finalMatches,
-                        });
-                    }
-
-                    return Task.FromResult<ActionDescriptor>(null);
+                        ActionsMatchingRouteConstraints = matchingRouteConstraints,
+                        ActionsMatchingActionConstraints = matchingActions,
+                        FinalMatches = finalMatches,
+                        SelectedAction = selectedAction
+                    });
                 }
-                else if (finalMatches.Count == 1)
+
+                return Task.FromResult(selectedAction);
+            }
+            else
+            {
+                if (_logger.IsEnabled(LogLevel.Verbose))
                 {
-                    var selectedAction = finalMatches[0];
-
-                    if (_logger.IsEnabled(LogLevel.Verbose))
+                    _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
                     {
-                        _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
-                        {
-                            ActionsMatchingRouteConstraints = matchingRouteConstraints,
-                            ActionsMatchingActionConstraints = matchingActions,
-                            FinalMatches = finalMatches,
-                            SelectedAction = selectedAction
-                        });
-                    }
-
-                    return Task.FromResult(selectedAction);
+                        ActionsMatchingRouteConstraints = matchingRouteConstraints,
+                        ActionsMatchingActionConstraints = matchingActions,
+                        FinalMatches = finalMatches,
+                    });
                 }
-                else
-                {
-                    if (_logger.IsEnabled(LogLevel.Verbose))
-                    {
-                        _logger.WriteValues(new DefaultActionSelectorSelectAsyncValues()
-                        {
-                            ActionsMatchingRouteConstraints = matchingRouteConstraints,
-                            ActionsMatchingActionConstraints = matchingActions,
-                            FinalMatches = finalMatches,
-                        });
-                    }
 
-                    var actionNames = string.Join(
-                        Environment.NewLine,
-                        finalMatches.Select(a => a.DisplayName));
+                var actionNames = string.Join(
+                    Environment.NewLine,
+                    finalMatches.Select(a => a.DisplayName));
 
-                    var message = Resources.FormatDefaultActionSelector_AmbiguousActions(
-                        Environment.NewLine,
-                        actionNames);
+                var message = Resources.FormatDefaultActionSelector_AmbiguousActions(
+                    Environment.NewLine,
+                    actionNames);
 
-                    throw new AmbiguousActionException(message);
-                }
+                throw new AmbiguousActionException(message);
             }
         }
 

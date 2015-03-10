@@ -71,8 +71,11 @@ namespace Microsoft.AspNet.Mvc
                 {
                     context.RouteData = newRouteData;
 
-                    await InvokeActionAsync(context, actionDescriptor);
-                    context.IsHandled = true;
+                    using (_logger.BeginScope(new ActionInvocationScopeValues((ControllerActionDescriptor)actionDescriptor)))
+                    {
+                        await InvokeActionAsync(context, actionDescriptor);
+                        context.IsHandled = true;
+                    }
                 }
                 finally
                 {
