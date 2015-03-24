@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Microsoft.AspNet.HtmlContent;
 using Microsoft.AspNet.Mvc.Core;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Internal;
@@ -18,8 +19,8 @@ namespace Microsoft.AspNet.Mvc.Rendering
         private static readonly string DisplayTemplateViewPath = "DisplayTemplates";
         private static readonly string EditorTemplateViewPath = "EditorTemplates";
 
-        private static readonly Dictionary<string, Func<IHtmlHelper, string>> _defaultDisplayActions =
-            new Dictionary<string, Func<IHtmlHelper, string>>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Dictionary<string, Func<IHtmlHelper, IHtmlContent>> _defaultDisplayActions =
+            new Dictionary<string, Func<IHtmlHelper, IHtmlContent>>(StringComparer.OrdinalIgnoreCase)
             {
                 { "Collection", DefaultDisplayTemplates.CollectionTemplate },
                 { "EmailAddress", DefaultDisplayTemplates.EmailAddressTemplate },

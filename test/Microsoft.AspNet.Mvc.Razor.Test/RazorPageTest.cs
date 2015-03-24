@@ -649,7 +649,7 @@ namespace Microsoft.AspNet.Mvc.Razor
             var page = CreatePage(p =>
             {
                 p.Write(new HtmlString("Hello world"));
-                p.Write(new HtmlString(stringCollectionWriter));
+                p.Write(stringCollectionWriter.Content);
             });
             page.ViewContext.Writer = writer;
 
