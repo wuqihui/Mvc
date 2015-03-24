@@ -1,9 +1,12 @@
 ﻿// Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using InlineConstraintsWebSite.Constraints;
 using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Routing;
 using Microsoft.AspNet.Routing.Constraints;
 using Microsoft.Framework.DependencyInjection;
+using System.Collections.Generic;
 
 namespace InlineConstraints
 {
@@ -12,6 +15,27 @@ namespace InlineConstraints
         // Set up application services
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Configure<RouteOptions>(
+                routeOptions => routeOptions.ConstraintMap.Add(
+                    "producttype",
+                    typeof(ItemTypeConstraint)));
+
+            services.Configure<RouteOptions>(
+                routeOptions => routeOptions.ConstraintMap.Add(
+                    "servicetype",
+                    typeof(ItemTypeConstraint)));
+
+            services.Configure<RouteOptions>(
+                routeOptions =>
+                {
+                    if (routeOptions.ConstraintMap.ContainsKey("servicetype"))
+                    {
+                        routeOptions.ConstraintMap["servicetype"] =
+                            typeof(ItemTypeUpperCaseConstraint);
+                    }
+                });
+
             // Add MVC services to the services container
             services.AddMvc();
         }
@@ -24,6 +48,16 @@ namespace InlineConstraints
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "producttype",
+                    template: "producttype/{action}/{type:producttype(software)}",
+                    defaults: new { controller = "inlineconstraints_software" });
+
+                routes.MapRoute(
+                    name: "servicetype",
+                    template: "producttype/{action}/{type:servicetype(hardware)}",
+                    defaults: new { controller = "inlineconstraints_hardware" });
+
                 routes.MapRoute("StoreId",
                         "store/{action}/{id:guid?}",
                         defaults: new { controller = "InlineConstraints_Store" });
@@ -38,6 +72,7 @@ namespace InlineConstraints
                 routes.MapRoute("areaExists", "area-exists/{controller=Home}/{action=Index}");
                 routes.MapRoute("areaWithoutExists-area", "area-withoutexists/{area}/{controller=Home}/{action=Index}");
                 routes.MapRoute("areaWithoutExists", "area-withoutexists/{controller=Home}/{action=Index}");
+
             });
         }
     }
