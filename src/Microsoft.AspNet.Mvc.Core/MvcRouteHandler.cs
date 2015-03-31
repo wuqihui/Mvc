@@ -102,7 +102,7 @@ namespace Microsoft.AspNet.Mvc
                         actionDescriptor.DisplayName));
             }
 
-            using (_logger.BeginScope(new ActionExecutionScopeValues(actionDescriptor)))
+            using (_logger.BeginScope("Executing action {ActionName}.", actionDescriptor.DisplayName))
             {
                 await invoker.InvokeAsync();
             }
